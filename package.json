@@ -28,7 +28,14 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "lint": "eslint src --ext .ts,.tsx",
+    "lint:fix": "eslint src --ext .ts,.tsx --fix",
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf build node_modules package-lock.json && npm install",
+    "ci": "npm ci",
+    "audit": "npm audit",
+    "audit:fix": "npm audit fix"
   },
   "eslintConfig": {
     "extends": [
