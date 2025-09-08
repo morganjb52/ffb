@@ -30,12 +30,12 @@ const Dashboard: React.FC = () => {
   const loadDashboardData = useCallback(async () => {
     setLoading(true);
     try {
-      // Mock teams data - simulating 10 teams across platforms
-      const mockTeams: FantasyTeam[] = [
+      // Use real teams from store, or show mock data if no teams
+      const displayTeams: FantasyTeam[] = teams.length > 0 ? teams : [
         {
           id: 'team-1',
           name: 'Championship Bound',
-          platform: 'ESPN',
+          platform: 'ESPN' as const,
           leagueId: 'espn-league-1',
           leagueName: 'ESPN Dynasty League',
           ownerId: 'user-1',
@@ -47,7 +47,7 @@ const Dashboard: React.FC = () => {
         {
           id: 'team-2',
           name: 'Yahoo Warriors',
-          platform: 'Yahoo',
+          platform: 'Yahoo' as const,
           leagueId: 'yahoo-league-1',
           leagueName: 'Yahoo Redraft League',
           ownerId: 'user-1',
@@ -59,7 +59,7 @@ const Dashboard: React.FC = () => {
         {
           id: 'team-3',
           name: 'Sleeper Squad',
-          platform: 'Sleeper',
+          platform: 'Sleeper' as const,
           leagueId: 'sleeper-league-1',
           leagueName: 'Sleeper Best Ball',
           ownerId: 'user-1',
@@ -71,7 +71,7 @@ const Dashboard: React.FC = () => {
         {
           id: 'team-4',
           name: 'CBS Dynasty',
-          platform: 'CBS',
+          platform: 'CBS' as const,
           leagueId: 'cbs-league-1',
           leagueName: 'CBS Dynasty League',
           ownerId: 'user-1',
@@ -83,7 +83,7 @@ const Dashboard: React.FC = () => {
         {
           id: 'team-5',
           name: 'ESPN Redraft',
-          platform: 'ESPN',
+          platform: 'ESPN' as const,
           leagueId: 'espn-league-2',
           leagueName: 'ESPN Redraft League',
           ownerId: 'user-1',
@@ -95,7 +95,7 @@ const Dashboard: React.FC = () => {
         {
           id: 'team-6',
           name: 'Yahoo Dynasty',
-          platform: 'Yahoo',
+          platform: 'Yahoo' as const,
           leagueId: 'yahoo-league-2',
           leagueName: 'Yahoo Dynasty League',
           ownerId: 'user-1',
@@ -107,7 +107,7 @@ const Dashboard: React.FC = () => {
         {
           id: 'team-7',
           name: 'Sleeper Redraft',
-          platform: 'Sleeper',
+          platform: 'Sleeper' as const,
           leagueId: 'sleeper-league-2',
           leagueName: 'Sleeper Redraft League',
           ownerId: 'user-1',
@@ -119,7 +119,7 @@ const Dashboard: React.FC = () => {
         {
           id: 'team-8',
           name: 'CBS Redraft',
-          platform: 'CBS',
+          platform: 'CBS' as const,
           leagueId: 'cbs-league-2',
           leagueName: 'CBS Redraft League',
           ownerId: 'user-1',
@@ -131,7 +131,7 @@ const Dashboard: React.FC = () => {
         {
           id: 'team-9',
           name: 'ESPN Best Ball',
-          platform: 'ESPN',
+          platform: 'ESPN' as const,
           leagueId: 'espn-league-3',
           leagueName: 'ESPN Best Ball League',
           ownerId: 'user-1',
@@ -143,7 +143,7 @@ const Dashboard: React.FC = () => {
         {
           id: 'team-10',
           name: 'Yahoo Best Ball',
-          platform: 'Yahoo',
+          platform: 'Yahoo' as const,
           leagueId: 'yahoo-league-3',
           leagueName: 'Yahoo Best Ball League',
           ownerId: 'user-1',
@@ -154,14 +154,17 @@ const Dashboard: React.FC = () => {
         }
       ];
 
-      useStore.getState().setTeams(mockTeams);
+      // Only set mock teams if no real teams exist
+      if (teams.length === 0) {
+        useStore.getState().setTeams(displayTeams);
+      }
       calculateWinLoss();
     } catch (error) {
       console.error('Failed to load dashboard data:', error);
     } finally {
       setLoading(false);
     }
-  }, [setLoading, calculateWinLoss]);
+  }, [setLoading, calculateWinLoss, teams]);
 
   const loadAllLineups = useCallback(async () => {
     const lineups: {[teamId: string]: Lineup} = {};

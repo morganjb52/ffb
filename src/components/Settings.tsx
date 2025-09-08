@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { Save, RefreshCw, Trash2, Plus, ExternalLink, CheckCircle, AlertCircle } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import ApiConnection from './ApiConnection';
+import { ESPNLogin } from './ESPNLogin';
+import { ESPNTeamUrl } from './ESPNTeamUrl';
+import { unifiedApi } from '../services/unifiedApi';
 
 const Settings: React.FC = () => {
   const { user, teams, setTeams, connections, setConnections } = useStore();
@@ -9,6 +12,8 @@ const Settings: React.FC = () => {
   const [activeTab, setActiveTab] = useState('connections');
   const [showAddTeam, setShowAddTeam] = useState(false);
   const [showApiConnection, setShowApiConnection] = useState(false);
+  const [showESPNLogin, setShowESPNLogin] = useState(false);
+  const [showESPNTeamUrl, setShowESPNTeamUrl] = useState(false);
   const [selectedPlatform, setSelectedPlatform] = useState<'ESPN' | 'Yahoo' | 'Sleeper' | 'CBS'>('ESPN');
   const [newTeam, setNewTeam] = useState({
     name: '',
@@ -53,12 +58,50 @@ const Settings: React.FC = () => {
 
   const handleConnectPlatform = (platform: string) => {
     setSelectedPlatform(platform as any);
-    setShowApiConnection(true);
+    
+    if (platform === 'ESPN') {
+      // Check if already authenticated
+      if (unifiedApi.isESPNAuthenticated()) {
+        setShowESPNTeamUrl(true);
+      } else {
+        setShowESPNLogin(true);
+      }
+    } else {
+      setShowApiConnection(true);
+    }
   };
 
   const handleApiConnectionSuccess = (teams: any[]) => {
     // Teams are already added to the store by the ApiConnection component
     setShowApiConnection(false);
+  };
+
+  const handleESPNLoginSuccess = (session: any) => {
+    setShowESPNLogin(false);
+    setShowESPNTeamUrl(true);
+  };
+
+  const handleESPNTeamUrlSuccess = async (teamData: any) => {
+    try {
+      // Add the team to the store
+      const fantasyTeam = {
+        id: `espn-${teamData.id}`,
+        name: teamData.name,
+        platform: 'ESPN' as const,
+        leagueId: teamData.leagueId,
+        leagueName: `ESPN League ${teamData.leagueId}`,
+        ownerId: 'user-1',
+        record: teamData.record,
+        season: teamData.season,
+        isActive: true,
+        lastSyncDate: new Date(),
+      };
+
+      setTeams([...teams, fantasyTeam]);
+      setShowESPNTeamUrl(false);
+    } catch (error) {
+      console.error('Failed to add ESPN team:', error);
+    }
   };
 
 
@@ -457,6 +500,22 @@ const Settings: React.FC = () => {
           platform={selectedPlatform}
           onSuccess={handleApiConnectionSuccess}
           onClose={() => setShowApiConnection(false)}
+        />
+      )}
+
+      {/* ESPN Login Modal */}
+      {showESPNLogin && (
+        <ESPNLogin
+          onSuccess={handleESPNLoginSuccess}
+          onCancel={() => setShowESPNLogin(false)}
+        />
+      )}
+
+      {/* ESPN Team URL Modal */}
+      {showESPNTeamUrl && (
+        <ESPNTeamUrl
+          onSuccess={handleESPNTeamUrlSuccess}
+          onCancel={() => setShowESPNTeamUrl(false)}
         />
       )}
     </div>

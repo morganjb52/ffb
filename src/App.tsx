@@ -4,6 +4,7 @@ import { useStore } from './store/useStore';
 import Layout from './components/Layout';
 import Dashboard from './components/Dashboard';
 import Settings from './components/Settings';
+import HTMLTest from './components/HTMLTest';
 
 function App() {
   const { setUser } = useStore();
@@ -29,6 +30,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Dashboard />} />
         <Route path="/settings" element={<Settings />} />
+        <Route path="/test" element={<HTMLTest />} />
       </Routes>
     </Layout>
   );

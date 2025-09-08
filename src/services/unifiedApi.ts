@@ -51,32 +51,27 @@ export class UnifiedApiService {
   }
 
   /**
-   * Connect to ESPN
+   * Connect to ESPN using team URL
    */
   private async connectESPN(credentials: ApiCredentials): Promise<ConnectionResult> {
-    const { leagueId, teamId, season } = credentials;
+    const { teamUrl } = credentials;
     
-    if (!leagueId || !teamId) {
-      throw new Error('ESPN requires league ID and team ID');
+    if (!teamUrl) {
+      throw new Error('ESPN requires team URL');
     }
 
     try {
-      const league = await this.espn.getLeague(leagueId, season);
-      const team = league.teams.find(t => t.id === teamId);
+      const teamData = await this.espn.getTeamFromUrl(teamUrl);
       
-      if (!team) {
-        throw new Error(`Team ${teamId} not found in league ${leagueId}`);
-      }
-
       const fantasyTeam: FantasyTeam = {
-        id: `espn-${teamId}`,
-        name: team.name,
+        id: `espn-${teamData.id}`,
+        name: teamData.name,
         platform: 'ESPN',
-        leagueId: leagueId,
-        leagueName: league.name,
+        leagueId: teamData.leagueId,
+        leagueName: `ESPN League ${teamData.leagueId}`,
         ownerId: 'user-1', // Would be actual user ID
-        record: team.record,
-        season: league.season,
+        record: teamData.record,
+        season: teamData.season,
         isActive: true,
         lastSyncDate: new Date(),
       };
@@ -89,6 +84,48 @@ export class UnifiedApiService {
     } catch (error) {
       throw new Error(`ESPN connection failed: ${error}`);
     }
+  }
+
+  /**
+   * Authenticate with ESPN
+   */
+  async authenticateESPN(username: string, password: string): Promise<any> {
+    return await this.espn.authenticate(username, password);
+  }
+
+  /**
+   * Check ESPN authentication status
+   */
+  isESPNAuthenticated(): boolean {
+    return this.espn.isAuthenticated();
+  }
+
+  /**
+   * Get ESPN authentication status
+   */
+  getESPNAuthStatus(): any {
+    return this.espn.getAuthStatus();
+  }
+
+  /**
+   * Test function to parse HTML directly (for debugging)
+   */
+  async testParseESPNHTML(html: string, leagueId?: string, teamId?: string, season?: string): Promise<any> {
+    return await this.espn.testParseHTML(html, leagueId, teamId, season);
+  }
+
+  /**
+   * Create ESPN team from HTML (bypasses authentication for testing)
+   */
+  async createESPNTeamFromHTML(html: string, leagueId?: string, teamId?: string, season?: string): Promise<ConnectionResult> {
+    return await this.espn.createTeamFromHTML(html, leagueId, teamId, season);
+  }
+
+  /**
+   * Test ESPN authentication
+   */
+  async testESPNAuthentication(): Promise<boolean> {
+    return await this.espn.testAuthentication();
   }
 
   /**
