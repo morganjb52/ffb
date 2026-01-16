@@ -106,3 +106,4 @@ Once connected, click "Sync" on any team to pull real lineup data!
 - **Data Accuracy**: All data comes directly from the fantasy platforms
 
 Your Fantasy Football Central app is now a **real, functional tool** that can manage your actual fantasy teams! 🏈🎉
+

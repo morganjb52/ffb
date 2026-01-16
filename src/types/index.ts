@@ -109,3 +109,4 @@ export interface SyncResult {
   message: string;
   timestamp: Date;
 }
+
